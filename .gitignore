@@ -1,12 +1,28 @@
+# Dependencies
 node_modules/
 */node_modules/
+
+# Build outputs
 dist/
 */dist/
+.angular/
+*/.angular/
+
+# Environment
 .env
 */.env
 !.env.example
 !*/.env.example
+
+# Logs
 *.log
-.DS_Store
+npm-debug.log*
+
+# IDE
 .vscode/
 .idea/
+*.swp
+.DS_Store
+
+# OS
+Thumbs.db
