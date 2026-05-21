@@ -8,6 +8,7 @@ import {
   holdingIdParamSchema,
   portfolioIdParamSchema,
 } from './holding.dto';
+import { transactionsUnderHoldingRouter } from '../transactions/transaction.routes';
 
 /**
  * Routes nested under /api/portfolios/:portfolioId/holdings
@@ -55,3 +56,5 @@ holdingsRouter.delete(
   validate(holdingIdParamSchema, 'params'),
   holdingController.remove,
 );
+// Mount nested transactions router
+holdingsRouter.use('/:holdingId/transactions', transactionsUnderHoldingRouter);
