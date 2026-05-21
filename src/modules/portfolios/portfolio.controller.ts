@@ -68,3 +68,18 @@ export async function remove(req: Request, res: Response, next: NextFunction) {
     next(err);
   }
 }
+
+export async function getSummary(req: Request, res: Response, next: NextFunction) {
+  try {
+    const userId = req.user!.id;
+    const id = req.params.id as string;
+    const summary = await portfolioService.getSummary(id, userId);
+    res.json(summary);
+  } catch (err) {
+    if (err instanceof portfolioService.PortfolioNotFoundError) {
+      res.status(404).json({ error: err.message });
+      return;
+    }
+    next(err);
+  }
+}

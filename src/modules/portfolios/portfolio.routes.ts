@@ -22,6 +22,12 @@ router.post(
 );
 
 router.get(
+  '/:id/summary',
+  validate(portfolioIdParamSchema, 'params'),
+  portfolioController.getSummary,
+);
+
+router.get(
   '/:id',
   validate(portfolioIdParamSchema, 'params'),
   portfolioController.getOne,
@@ -40,7 +46,6 @@ router.delete(
   portfolioController.remove,
 );
 
-// Mount nested holdings router under /:portfolioId/holdings
 router.use('/:portfolioId/holdings', holdingsUnderPortfolioRouter);
 
 export default router;
