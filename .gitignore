@@ -1,18 +1,23 @@
+# Project root se
+cat > .gitignore << 'EOF'
 # Dependencies
 node_modules/
 */node_modules/
+**/node_modules/
 
 # Build outputs
 dist/
 */dist/
+**/dist/
 .angular/
 */.angular/
 
 # Environment
 .env
 */.env
+**/.env
 !.env.example
-!*/.env.example
+!**/.env.example
 
 # Logs
 *.log
@@ -23,6 +28,5 @@ npm-debug.log*
 .idea/
 *.swp
 .DS_Store
-
-# OS
 Thumbs.db
+EOF
