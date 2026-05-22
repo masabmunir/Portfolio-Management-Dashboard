@@ -1,12 +1,22 @@
-import { ApplicationConfig, provideBrowserGlobalErrorListeners, provideZoneChangeDetection } from '@angular/core';
+import { ApplicationConfig, provideZoneChangeDetection, inject, provideAppInitializer } from '@angular/core';
 import { provideRouter } from '@angular/router';
-
+import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { routes } from './app.routes';
+import { jwtInterceptor } from './core/interceptors/jwt.interceptor';
+import { errorInterceptor } from './core/interceptors/error.interceptor';
+import { AuthService } from './core/services/auth.service';
 
 export const appConfig: ApplicationConfig = {
   providers: [
-    provideBrowserGlobalErrorListeners(),
     provideZoneChangeDetection({ eventCoalescing: true }),
-    provideRouter(routes)
-  ]
+    provideRouter(routes),
+    // HTTP client with both interceptors. Order matters:
+    // jwtInterceptor attaches token first, then errorInterceptor wraps the response.
+    provideHttpClient(withInterceptors([jwtInterceptor, errorInterceptor])),
+    // Restore auth state from localStorage on app boot
+    provideAppInitializer(() => {
+      const authService = inject(AuthService);
+      authService.initializeFromStorage();
+    }),
+  ],
 };
