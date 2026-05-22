@@ -44,10 +44,15 @@ export class AuthService {
   }
 
   login(request: LoginRequest): Observable<AuthResponse> {
-    return this.api.post<AuthResponse>('/auth/login', request).pipe(
-      tap((response) => this.handleAuthSuccess(response)),
-    );
-  }
+  console.log('🚀 Login Request Payload:', request);
+
+  return this.api.post<AuthResponse>('/auth/login', request).pipe(
+    tap((response) => {
+      console.log('✅ Login Success Response:', response);
+      this.handleAuthSuccess(response);
+    })
+  );
+}
 
   /**
    * Used by error interceptor to silently refresh on 401.
