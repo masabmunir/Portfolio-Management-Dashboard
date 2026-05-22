@@ -5,14 +5,6 @@ import { Router } from '@angular/router';
 import { AuthService } from '../services/auth.service';
 import { TokenService } from '../services/token.service';
 
-/**
- * Auto-refresh flow:
- * 1. If a request fails with 401 (and isn't itself a refresh call), call refresh
- * 2. If refresh succeeds, retry the original request with new token
- * 3. If refresh fails, log out the user
- *
- * Concurrency: multiple parallel 401s share the same refresh attempt.
- */
 
 // State shared across concurrent interceptor calls
 let isRefreshing = false;

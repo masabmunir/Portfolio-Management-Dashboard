@@ -10,10 +10,7 @@ export const appConfig: ApplicationConfig = {
   providers: [
     provideZoneChangeDetection({ eventCoalescing: true }),
     provideRouter(routes),
-    // HTTP client with both interceptors. Order matters:
-    // jwtInterceptor attaches token first, then errorInterceptor wraps the response.
     provideHttpClient(withInterceptors([jwtInterceptor, errorInterceptor])),
-    // Restore auth state from localStorage on app boot
     provideAppInitializer(() => {
       const authService = inject(AuthService);
       authService.initializeFromStorage();
