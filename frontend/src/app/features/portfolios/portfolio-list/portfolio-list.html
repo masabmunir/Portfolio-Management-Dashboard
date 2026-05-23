@@ -1,0 +1,61 @@
+<div class="page-header">
+  <div>
+    <h1>Portfolios</h1>
+    <p class="subtitle">Manage your investment portfolios</p>
+  </div>
+  <button (click)="toggleCreateForm()" class="btn btn-primary">
+    @if (showCreateForm()) { Cancel } @else { + New Portfolio }
+  </button>
+</div>
+
+@if (showCreateForm()) {
+  <div class="create-form-card">
+    <h3>Create new portfolio</h3>
+    <form [formGroup]="createForm" (ngSubmit)="onCreate()" novalidate>
+      <div class="form-row">
+        <input
+          type="text"
+          formControlName="name"
+          placeholder="e.g., Retirement Fund"
+          maxlength="100"
+        />
+        <button type="submit" [disabled]="creating()" class="btn btn-primary">
+          @if (creating()) { Creating... } @else { Create }
+        </button>
+      </div>
+      @if (createForm.controls.name.touched && createForm.controls.name.invalid) {
+        <span class="error-text">Name is required</span>
+      }
+      @if (createError()) {
+        <div class="alert alert-error">{{ createError() }}</div>
+      }
+    </form>
+  </div>
+}
+
+@if (loading()) {
+  <div class="empty-state">Loading...</div>
+} @else if (errorMessage()) {
+  <div class="alert alert-error">{{ errorMessage() }}</div>
+} @else if (portfolios().length === 0) {
+  <div class="empty-state">
+    <h3>No portfolios yet</h3>
+    <p>Create your first portfolio to start tracking investments.</p>
+  </div>
+} @else {
+  <div class="portfolio-grid">
+    @for (portfolio of portfolios(); track portfolio.id) {
+      <div class="portfolio-card" (click)="openPortfolio(portfolio)">
+        <div class="card-body">
+          <h3>{{ portfolio.name }}</h3>
+          <p class="meta">Created {{ portfolio.createdAt | date: 'mediumDate' }}</p>
+        </div>
+        <div class="card-actions">
+          <button (click)="onDelete(portfolio, $event)" class="btn-icon" title="Delete">
+            🗑️
+          </button>
+        </div>
+      </div>
+    }
+  </div>
+}

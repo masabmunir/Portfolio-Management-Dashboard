@@ -1,16 +1,11 @@
-import { Component, inject } from '@angular/core';
-import { AuthService } from '../../core/services/auth.service';
+import { Component } from '@angular/core';
+import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
+  imports: [RouterLink],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.scss',
 })
-export class Dashboard {
-  private authService = inject(AuthService);
-
-  logout(): void {
-    this.authService.logout();
-  }
-}
+export class Dashboard {}

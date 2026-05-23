@@ -3,11 +3,6 @@ import { authGuard } from './core/guards/auth.guard';
 
 export const routes: Routes = [
   {
-    path: '',
-    redirectTo: 'dashboard',
-    pathMatch: 'full',
-  },
-  {
     path: 'login',
     loadComponent: () => import('./features/auth/login/login').then((m) => m.Login),
   },
@@ -16,9 +11,29 @@ export const routes: Routes = [
     loadComponent: () => import('./features/auth/register/register').then((m) => m.Register),
   },
   {
-    path: 'dashboard',
+    // All protected routes nested under shell layout
+    path: '',
     canActivate: [authGuard],
-    loadComponent: () => import('./features/dashboard/dashboard').then((m) => m.Dashboard),
+    loadComponent: () => import('./features/layout/shell/shell').then((m) => m.Shell),
+    children: [
+      {
+        path: '',
+        redirectTo: 'dashboard',
+        pathMatch: 'full',
+      },
+      {
+        path: 'dashboard',
+        loadComponent: () =>
+          import('./features/dashboard/dashboard').then((m) => m.Dashboard),
+      },
+      {
+        path: 'portfolios',
+        loadComponent: () =>
+          import('./features/portfolios/portfolio-list/portfolio-list').then(
+            (m) => m.PortfolioList,
+          ),
+      },
+    ],
   },
   {
     path: '**',

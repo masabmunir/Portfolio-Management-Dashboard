@@ -1,0 +1,18 @@
+<div class="app-shell">
+  <header class="top-nav">
+    <div class="nav-container">
+      <a routerLink="/dashboard" class="brand">📊 Portfolio</a>
+
+      <nav class="nav-links">
+        <a routerLink="/dashboard" routerLinkActive="active">Dashboard</a>
+        <a routerLink="/portfolios" routerLinkActive="active">Portfolios</a>
+      </nav>
+
+      <button (click)="logout()" class="btn-logout">Logout</button>
+    </div>
+  </header>
+
+  <main class="main-content">
+    <router-outlet />
+  </main>
+</div>
