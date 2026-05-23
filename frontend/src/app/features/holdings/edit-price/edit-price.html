@@ -1,0 +1,26 @@
+<app-modal [title]="'Update price: ' + holding().symbol" (closed)="closed.emit()">
+  <form [formGroup]="form" (ngSubmit)="onSubmit()" novalidate>
+    <div class="form-group">
+      <label for="price">Current Price ($)</label>
+      <input
+        id="price"
+        type="number"
+        formControlName="currentPrice"
+        step="0.01"
+        min="0"
+        autofocus
+      />
+    </div>
+
+    @if (errorMessage()) {
+      <div class="alert alert-error">{{ errorMessage() }}</div>
+    }
+
+    <div class="form-actions">
+      <button type="button" (click)="closed.emit()" class="btn btn-secondary">Cancel</button>
+      <button type="submit" [disabled]="loading()" class="btn btn-primary">
+        @if (loading()) { Saving... } @else { Save }
+      </button>
+    </div>
+  </form>
+</app-modal>

@@ -11,7 +11,6 @@ export const routes: Routes = [
     loadComponent: () => import('./features/auth/register/register').then((m) => m.Register),
   },
   {
-    // All protected routes nested under shell layout
     path: '',
     canActivate: [authGuard],
     loadComponent: () => import('./features/layout/shell/shell').then((m) => m.Shell),
@@ -31,6 +30,13 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./features/portfolios/portfolio-list/portfolio-list').then(
             (m) => m.PortfolioList,
+          ),
+      },
+      {
+        path: 'portfolios/:id',
+        loadComponent: () =>
+          import('./features/portfolios/portfolio-detail/portfolio-detail').then(
+            (m) => m.PortfolioDetail,
           ),
       },
     ],

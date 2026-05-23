@@ -1,0 +1,130 @@
+<div class="breadcrumb">
+  <a routerLink="/portfolios">← Back to Portfolios</a>
+</div>
+
+@if (loading()) {
+  <div class="empty-state">Loading...</div>
+} @else if (errorMessage()) {
+  <div class="alert alert-error">{{ errorMessage() }}</div>
+} @else if (summary(); as s) {
+  <!-- Summary Card -->
+  <div class="summary-card">
+    <div class="summary-header">
+      <h1>{{ s.portfolio.name }}</h1>
+    </div>
+
+    <div class="summary-metrics">
+      <div class="metric">
+        <span class="metric-label">Market Value</span>
+        <span class="metric-value">${{ s.totals.marketValue | number: '1.2-2' }}</span>
+      </div>
+      <div class="metric">
+        <span class="metric-label">Cost Basis</span>
+        <span class="metric-value">${{ s.totals.costBasis | number: '1.2-2' }}</span>
+      </div>
+      <div class="metric">
+        <span class="metric-label">Unrealized Gain</span>
+        <span class="metric-value" [class]="gainClass(s.totals.unrealizedGain)">
+          ${{ s.totals.unrealizedGain | number: '1.2-2' }}
+        </span>
+      </div>
+      <div class="metric">
+        <span class="metric-label">Return %</span>
+        <span class="metric-value" [class]="gainClass(s.totals.unrealizedGainPct)">
+          {{ s.totals.unrealizedGainPct }}%
+        </span>
+      </div>
+      <div class="metric">
+        <span class="metric-label">Holdings</span>
+        <span class="metric-value">{{ s.totals.holdingsCount }}</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Holdings Section -->
+  <div class="section-header">
+    <h2>Holdings</h2>
+    <button (click)="showAddHolding.set(true)" class="btn btn-primary">+ Add Holding</button>
+  </div>
+
+  @if (s.holdings.length === 0) {
+    <div class="empty-state">
+      <h3>No holdings yet</h3>
+      <p>Add your first investment to start tracking.</p>
+    </div>
+  } @else {
+    <div class="table-wrapper">
+      <table class="holdings-table">
+        <thead>
+          <tr>
+            <th>Symbol</th>
+            <th>Name</th>
+            <th>Type</th>
+            <th class="num">Quantity</th>
+            <th class="num">Avg Cost</th>
+            <th class="num">Current Price</th>
+            <th class="num">Market Value</th>
+            <th class="num">Gain</th>
+            <th class="num">Return %</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (h of s.holdings; track h.id) {
+            <tr (click)="openHolding(h)">
+              <td class="symbol">{{ h.symbol }}</td>
+              <td>{{ h.name }}</td>
+              <td><span class="type-badge">{{ h.assetType }}</span></td>
+              <td class="num">{{ h.quantity | number: '1.0-6' }}</td>
+              <td class="num">${{ h.avgCost | number: '1.2-4' }}</td>
+              <td class="num">
+                <button
+                  class="price-edit"
+                  (click)="$event.stopPropagation(); editingHolding.set(h)"
+                  title="Click to edit"
+                >
+                  ${{ h.currentPrice | number: '1.2-4' }} ✏️
+                </button>
+              </td>
+              <td class="num">${{ h.marketValue | number: '1.2-2' }}</td>
+              <td class="num" [class]="gainClass(h.unrealizedGain)">
+                ${{ h.unrealizedGain | number: '1.2-2' }}
+              </td>
+              <td class="num" [class]="gainClass(h.unrealizedGainPct)">
+                {{ h.unrealizedGainPct }}%
+              </td>
+              <td class="actions">
+                <button
+                  (click)="onDeleteHolding(h, $event)"
+                  class="btn-icon"
+                  title="Delete"
+                >
+                  🗑️
+                </button>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+} @else {
+  <div class="empty-state">Portfolio not found</div>
+}
+
+<!-- Modals -->
+@if (showAddHolding()) {
+  <app-add-holding
+    [portfolioId]="portfolioId()"
+    (closed)="showAddHolding.set(false)"
+    (created)="onHoldingAdded()"
+  />
+}
+
+@if (editingHolding(); as eh) {
+  <app-edit-price
+    [holding]="eh"
+    (closed)="editingHolding.set(null)"
+    (updated)="onPriceUpdated()"
+  />
+}
