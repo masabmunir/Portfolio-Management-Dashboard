@@ -1,0 +1,129 @@
+<div class="breadcrumb">
+  <a (click)="goBack()" class="back-link">← Back to Portfolio</a>
+</div>
+
+@if (loading()) {
+  <div class="empty-state">Loading...</div>
+} @else if (errorMessage()) {
+  <div class="alert alert-error">{{ errorMessage() }}</div>
+} @else if (holding(); as h) {
+  <!-- Holding Info Card -->
+  <div class="holding-card">
+    <div class="holding-header">
+      <div>
+        <div class="symbol-row">
+          <h1>{{ h.symbol }}</h1>
+          <span class="type-badge">{{ h.assetType }}</span>
+        </div>
+        <p class="holding-name">{{ h.name }}</p>
+      </div>
+    </div>
+
+    <div class="holding-metrics">
+      <div class="metric">
+        <span class="metric-label">Quantity</span>
+        <span class="metric-value">{{ h.quantity | number: '1.0-6' }}</span>
+      </div>
+      <div class="metric">
+        <span class="metric-label">Avg Cost</span>
+        <span class="metric-value">${{ h.avgCost | number: '1.2-4' }}</span>
+      </div>
+      <div class="metric">
+        <span class="metric-label">Current Price</span>
+        <span class="metric-value">${{ h.currentPrice | number: '1.2-4' }}</span>
+      </div>
+      <div class="metric">
+        <span class="metric-label">Market Value</span>
+        <span class="metric-value">${{ h.marketValue | number: '1.2-2' }}</span>
+      </div>
+      <div class="metric">
+        <span class="metric-label">Unrealized Gain</span>
+        <span class="metric-value" [class]="gainClass(h.unrealizedGain)">
+          ${{ h.unrealizedGain | number: '1.2-2' }}
+        </span>
+      </div>
+      <div class="metric">
+        <span class="metric-label">Return %</span>
+        <span class="metric-value" [class]="gainClass(h.unrealizedGainPct)">
+          {{ h.unrealizedGainPct }}%
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Transactions Section -->
+  <div class="section-header">
+    <h2>Transactions</h2>
+    <button (click)="showAddTransaction.set(true)" class="btn btn-primary">
+      + Add Transaction
+    </button>
+  </div>
+
+  @if (transactions().length === 0) {
+    <div class="empty-state">
+      <h3>No transactions yet</h3>
+      <p>Record your first BUY transaction to start building this position.</p>
+    </div>
+  } @else {
+    <div class="table-wrapper">
+      <table class="transactions-table">
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Type</th>
+            <th class="num">Quantity</th>
+            <th class="num">Price</th>
+            <th class="num">Fees</th>
+            <th class="num">Total</th>
+            <th>Notes</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (tx of transactions(); track tx.id) {
+            <tr>
+              <td>{{ tx.executedAt | date: 'mediumDate' }}</td>
+              <td>
+                <span
+                  class="tx-type-badge"
+                  [class.buy]="tx.type === TransactionType.BUY"
+                  [class.sell]="tx.type === TransactionType.SELL"
+                >
+                  {{ tx.type }}
+                </span>
+              </td>
+              <td class="num">{{ tx.quantity | number: '1.0-6' }}</td>
+              <td class="num">${{ tx.price | number: '1.2-4' }}</td>
+              <td class="num">${{ tx.fees | number: '1.2-2' }}</td>
+              <td class="num">
+                ${{ ((+tx.quantity * +tx.price) + +tx.fees) | number: '1.2-2' }}
+              </td>
+              <td class="notes-cell">{{ tx.notes || '—' }}</td>
+              <td class="actions">
+                <button
+                  (click)="onDeleteTransaction(tx)"
+                  class="btn-icon"
+                  title="Delete (will recalculate holding)"
+                >
+                  🗑️
+                </button>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+} @else {
+  <div class="empty-state">Holding not found</div>
+}
+
+<!-- Add Transaction Modal -->
+@if (showAddTransaction() && holding(); as h) {
+  <app-add-transaction
+    [holdingId]="h.id"
+    [holdingSymbol]="h.symbol"
+    (closed)="showAddTransaction.set(false)"
+    (created)="onTransactionAdded()"
+  />
+}

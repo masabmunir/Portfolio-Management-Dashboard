@@ -39,6 +39,13 @@ export const routes: Routes = [
             (m) => m.PortfolioDetail,
           ),
       },
+      {
+        path: 'holdings/:id',
+        loadComponent: () =>
+          import('./features/holdings/holding-detail/holding-detail').then(
+            (m) => m.HoldingDetail,
+          ),
+      },
     ],
   },
   {

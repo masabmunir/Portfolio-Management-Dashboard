@@ -1,8 +1,150 @@
-<div class="dashboard-placeholder">
-  <h1>Dashboard</h1>
-  <p>Welcome! 🎉</p>
-  <p class="hint">
-    Go to <a routerLink="/portfolios">Portfolios</a> to manage your investments.
-  </p>
-  <p class="hint">Full dashboard with charts coming in next step.</p>
-</div>
+@if (loading()) {
+  <div class="empty-state">Loading dashboard...</div>
+} @else if (errorMessage()) {
+  <div class="alert alert-error">{{ errorMessage() }}</div>
+} @else if (portfolios().length === 0) {
+  <div class="welcome-card">
+    <h1>Welcome! 👋</h1>
+    <p>You haven't created any portfolios yet.</p>
+    <a routerLink="/portfolios" class="btn btn-primary">Create your first portfolio</a>
+  </div>
+} @else {
+  <!-- Top Metrics Row -->
+  <div class="metrics-row">
+    <div class="metric-card primary">
+      <span class="metric-label">Total Market Value</span>
+      <span class="metric-value">${{ totals().marketValue | number: '1.2-2' }}</span>
+      <span class="metric-meta">
+        {{ totals().portfolioCount }} portfolio{{ totals().portfolioCount === 1 ? '' : 's' }}
+      </span>
+    </div>
+
+    <div class="metric-card">
+      <span class="metric-label">Total Cost Basis</span>
+      <span class="metric-value">${{ totals().costBasis | number: '1.2-2' }}</span>
+      <span class="metric-meta">
+        {{ totals().holdingsCount }} holding{{ totals().holdingsCount === 1 ? '' : 's' }}
+      </span>
+    </div>
+
+    <div class="metric-card">
+      <span class="metric-label">Unrealized Gain</span>
+      <span class="metric-value" [class]="gainClass(totals().unrealizedGain)">
+        ${{ totals().unrealizedGain | number: '1.2-2' }}
+      </span>
+      <span class="metric-meta">All-time</span>
+    </div>
+
+    <div class="metric-card">
+      <span class="metric-label">Return</span>
+      <span class="metric-value" [class]="gainClass(totals().unrealizedGainPct)">
+        {{ totals().unrealizedGainPct | number: '1.2-2' }}%
+      </span>
+      <span class="metric-meta">Overall</span>
+    </div>
+  </div>
+
+  <!-- Chart + Portfolios Grid -->
+  <div class="dashboard-grid">
+    <!-- Asset Allocation Chart -->
+    <div class="panel">
+      <div class="panel-header">
+        <h2>Asset Allocation</h2>
+      </div>
+      <div class="panel-body">
+        @if (hasAnyData()) {
+          <div class="chart-container">
+            <canvas
+              baseChart
+              [data]="assetChartData()"
+              [options]="assetChartOptions"
+              [type]="'doughnut'"
+            ></canvas>
+          </div>
+        } @else {
+          <div class="empty-state-small">
+            <p>Add holdings to see your asset allocation</p>
+          </div>
+        }
+      </div>
+    </div>
+
+    <!-- Portfolios List -->
+    <div class="panel">
+      <div class="panel-header">
+        <h2>Your Portfolios</h2>
+        <a routerLink="/portfolios" class="view-all">View all →</a>
+      </div>
+      <div class="panel-body no-padding">
+        <div class="portfolio-list">
+          @for (item of portfolios(); track item.portfolio.id) {
+            <div class="portfolio-row" (click)="openPortfolio(item.portfolio)">
+              <div class="portfolio-info">
+                <span class="portfolio-name">{{ item.portfolio.name }}</span>
+                <span class="portfolio-meta">
+                  {{ item.summary.totals.holdingsCount }} holding{{ item.summary.totals.holdingsCount === 1 ? '' : 's' }}
+                </span>
+              </div>
+              <div class="portfolio-value">
+                <span class="value">${{ item.summary.totals.marketValue | number: '1.2-2' }}</span>
+                <span class="gain" [class]="gainClass(item.summary.totals.unrealizedGain)">
+                  {{ +item.summary.totals.unrealizedGain >= 0 ? '+' : '' }}${{ item.summary.totals.unrealizedGain | number: '1.2-2' }}
+                  ({{ item.summary.totals.unrealizedGainPct }}%)
+                </span>
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Recent Transactions -->
+  <div class="panel">
+    <div class="panel-header">
+      <h2>Recent Transactions</h2>
+    </div>
+    <div class="panel-body no-padding">
+      @if (recentTransactions().length === 0) {
+        <div class="empty-state-small">
+          <p>No transactions yet</p>
+        </div>
+      } @else {
+        <table class="transactions-table">
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Portfolio</th>
+              <th>Type</th>
+              <th class="num">Quantity</th>
+              <th class="num">Price</th>
+              <th class="num">Total</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (tx of recentTransactions(); track tx.id) {
+              <tr>
+                <td>{{ tx.executedAt | date: 'mediumDate' }}</td>
+                <td class="portfolio-cell">{{ tx.portfolioName }}</td>
+                <td>
+                  <span
+                    class="tx-type-badge"
+                    [class.buy]="tx.type === TransactionType.BUY"
+                    [class.sell]="tx.type === TransactionType.SELL"
+                  >
+                    {{ tx.type }}
+                  </span>
+                </td>
+                <td class="num">{{ tx.quantity | number: '1.0-6' }}</td>
+                <td class="num">${{ tx.price | number: '1.2-2' }}</td>
+                <td class="num">
+                  ${{ ((+tx.quantity * +tx.price) + +tx.fees) | number: '1.2-2' }}
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      }
+    </div>
+  </div>
+}

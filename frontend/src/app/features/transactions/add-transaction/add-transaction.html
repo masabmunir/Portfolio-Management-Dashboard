@@ -1,0 +1,89 @@
+<app-modal [title]="'Add transaction: ' + holdingSymbol()" (closed)="closed.emit()">
+  <form [formGroup]="form" (ngSubmit)="onSubmit()" novalidate>
+    <div class="form-row">
+      <div class="form-group">
+        <label for="type">Type</label>
+        <select id="type" formControlName="type">
+          @for (t of transactionTypes; track t) {
+            <option [value]="t">{{ t }}</option>
+          }
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="date">Date</label>
+        <input
+          id="date"
+          type="date"
+          formControlName="executedAt"
+        />
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label for="quantity">Quantity</label>
+        <input
+          id="quantity"
+          type="number"
+          formControlName="quantity"
+          step="0.000001"
+          min="0"
+          placeholder="0"
+        />
+        @if (form.controls.quantity.touched && form.controls.quantity.invalid) {
+          <span class="error-text">Quantity must be greater than 0</span>
+        }
+      </div>
+
+      <div class="form-group">
+        <label for="price">Price per unit ($)</label>
+        <input
+          id="price"
+          type="number"
+          formControlName="price"
+          step="0.01"
+          min="0"
+          placeholder="0.00"
+        />
+        @if (form.controls.price.touched && form.controls.price.invalid) {
+          <span class="error-text">Valid price required</span>
+        }
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="fees">Fees ($) <span class="optional">optional</span></label>
+      <input
+        id="fees"
+        type="number"
+        formControlName="fees"
+        step="0.01"
+        min="0"
+        placeholder="0.00"
+      />
+    </div>
+
+    <div class="form-group">
+      <label for="notes">Notes <span class="optional">optional</span></label>
+      <textarea
+        id="notes"
+        formControlName="notes"
+        rows="2"
+        placeholder="Any notes about this transaction..."
+        maxlength="1000"
+      ></textarea>
+    </div>
+
+    @if (errorMessage()) {
+      <div class="alert alert-error">{{ errorMessage() }}</div>
+    }
+
+    <div class="form-actions">
+      <button type="button" (click)="closed.emit()" class="btn btn-secondary">Cancel</button>
+      <button type="submit" [disabled]="loading()" class="btn btn-primary">
+        @if (loading()) { Adding... } @else { Add Transaction }
+      </button>
+    </div>
+  </form>
+</app-modal>

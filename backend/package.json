@@ -3,16 +3,17 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "dev": "ts-node-dev --respawn --transpile-only src/server.ts",
-    "build": "tsc",
-    "start": "node dist/server.js",
-    "typeorm": "typeorm-ts-node-commonjs",
-    "migration:generate": "npm run typeorm -- migration:generate -d src/config/data-source.ts",
-    "migration:run": "npm run typeorm -- migration:run -d src/config/data-source.ts",
-    "migration:revert": "npm run typeorm -- migration:revert -d src/config/data-source.ts"
-  },
+  "dev": "ts-node-dev --respawn --transpile-only src/server.ts",
+  "build": "tsc",
+  "start": "node dist/server.js",
+  "typeorm": "typeorm-ts-node-commonjs",
+  "migration:generate": "npm run typeorm -- migration:generate -d src/config/data-source.ts",
+  "migration:run": "npm run typeorm -- migration:run -d src/config/data-source.ts",
+  "migration:revert": "npm run typeorm -- migration:revert -d src/config/data-source.ts",
+  "migration:run:prod": "node ./node_modules/typeorm/cli.js migration:run -d ./dist/config/data-source.js"
+},
   "keywords": [],
-  "author": "",
+  "author": "", 
   "license": "ISC",
   "dependencies": {
     "@types/bcrypt": "^6.0.0",
