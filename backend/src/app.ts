@@ -6,6 +6,7 @@ import authRoutes from './modules/auth/auth.routes';
 import portfolioRoutes from './modules/portfolios/portfolio.routes';
 import { holdingsRouter } from './modules/holdings/holding.routes';
 import { transactionsRouter } from './modules/transactions/transaction.routes';
+import chatRoutes from './modules/chat/chat.routes';
 
 export function createApp() {
   const app = express();
@@ -22,6 +23,7 @@ export function createApp() {
   app.use('/api/portfolios', portfolioRoutes);
   app.use('/api/holdings', holdingsRouter);
   app.use('/api/transactions', transactionsRouter);
+  app.use('/api/chat', chatRoutes);
 
   app.use((_req: Request, res: Response) => {
     res.status(404).json({ error: 'Not Found' });

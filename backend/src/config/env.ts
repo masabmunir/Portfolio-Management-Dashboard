@@ -24,4 +24,7 @@ export const env = {
     refreshTtl: process.env.JWT_REFRESH_TTL ?? '7d',
   },
   corsOrigin: process.env.CORS_ORIGIN ?? 'http://localhost:4200',
+    gemini: {
+    apiKey: process.env.GEMINI_API_KEY ?? '',
+  },
 };

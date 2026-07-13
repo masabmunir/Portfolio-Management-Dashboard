@@ -1,15 +1,13 @@
 import { Request, Response, NextFunction } from 'express';
-import { ZodSchema, ZodError } from 'zod';
+import { ZodSchema } from 'zod';
 
 type RequestPart = 'body' | 'query' | 'params';
-
 
 export function validate(schema: ZodSchema, part: RequestPart = 'body') {
   return (req: Request, res: Response, next: NextFunction): void => {
     const result = schema.safeParse(req[part]);
 
     if (!result.success) {
-      // Format Zod errors into a clean, client-friendly structure
       const errors = result.error.issues.map((issue) => ({
         path: issue.path.join('.'),
         message: issue.message,
@@ -22,8 +20,17 @@ export function validate(schema: ZodSchema, part: RequestPart = 'body') {
       return;
     }
 
-    // Replace the request part with the validated/parsed value.
-    req[part] = result.data;
+    // Fix: query read-only hai — Object.defineProperty use karo
+    if (part === 'query') {
+      Object.defineProperty(req, 'query', {
+        value: result.data,
+        writable: true,
+        configurable: true,
+      });
+    } else {
+      req[part] = result.data;
+    }
+
     next();
   };
 }

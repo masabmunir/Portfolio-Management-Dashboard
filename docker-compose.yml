@@ -7,6 +7,8 @@ services:
       POSTGRES_USER: ${POSTGRES_USER:-portfolio}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-portfolio_dev_pw}
       POSTGRES_DB: ${POSTGRES_DB:-portfolio_db}
+    ports:
+      - "5433:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
@@ -14,7 +16,6 @@ services:
       interval: 5s
       timeout: 5s
       retries: 10
-    # NOT exposing 5432 to host — only accessible inside Docker network
 
   backend:
     build:
@@ -38,7 +39,7 @@ services:
       JWT_ACCESS_TTL: 15m
       JWT_REFRESH_TTL: 7d
       CORS_ORIGIN: http://localhost:4200
-    # Run migrations before starting the app
+      GEMINI_API_KEY: ${GEMINI_API_KEY}
     command: sh -c "npm run migration:run:prod && node dist/server.js"
 
   frontend:
@@ -51,7 +52,6 @@ services:
       - backend
     ports:
       - "4200:80"
-    # This is the only port exposed to the host
 
 volumes:
   postgres_data:
